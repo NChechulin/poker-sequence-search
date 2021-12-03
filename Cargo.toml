@@ -1,5 +1,5 @@
 [package]
-name = "poker-patterns-search"
+name = "poker-sequence-search"
 version = "0.1.0"
 edition = "2021"
 
