@@ -5,6 +5,11 @@ A task from Algorithms and Data Structures course in HSE
 
 Available [here](assets/task_statement.pdf)
 
+## Screenshots
+
+![](assets/proof_of_work.jpg)
+![](assets/passes_tests.jpg)
+
 ## Approach
 
 The main idea was to modify Z-String algorithm in such a way that it could be used with custom object. It turns out that the simplest solution was to use bytes like `0x00_SS_RRRR`, where `SS` is suit (from 0 to 3) and `RRRR` is rank (from 1 to 13).
