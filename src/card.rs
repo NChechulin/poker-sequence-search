@@ -2,16 +2,16 @@ extern crate num;
 
 use num::FromPrimitive;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub enum Suit {
-    Clubs,
-    Diamonds,
-    Hearts,
-    Spades,
+    Clubs = 0,
+    Diamonds = 1,
+    Hearts = 2,
+    Spades = 3,
 }
 
 enum_from_primitive! {
-#[derive(Debug, PartialEq, Ord, PartialOrd, Eq)]
+#[derive(Debug, PartialEq, Ord, PartialOrd, Eq, Copy, Clone)]
 pub enum Rank {
     Ace = 1,
     Two = 2,
@@ -29,7 +29,7 @@ pub enum Rank {
 }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub struct Card {
     pub suit: Suit,
     pub rank: Rank,
@@ -75,6 +75,15 @@ impl Card {
             rank: Rank::from_string(rank),
         }
     }
+
+    /// represent card as a byte
+    pub fn to_byte(&self) -> u8 {
+        // formatted as follows: `0x00SSRRRR` where SS is a suit (bin 00-11) and RRRR is a rank (bin 0001-1101);
+        let rank = self.rank.clone() as u8;
+        let suit = self.suit.clone() as u8;
+
+        (suit << 4) + rank
+    }
 }
 
 #[cfg(test)]
@@ -87,28 +96,28 @@ mod tests {
             Card::from_string("CLUBS#ACE".to_string()),
             Card {
                 suit: Suit::Clubs,
-                rank: Rank::Ace
+                rank: Rank::Ace,
             }
         );
         assert_eq!(
             Card::from_string("HEARTS#JACK".to_string()),
             Card {
                 suit: Suit::Hearts,
-                rank: Rank::Jack
+                rank: Rank::Jack,
             }
         );
         assert_eq!(
             Card::from_string("SPADES#9".to_string()),
             Card {
                 suit: Suit::Spades,
-                rank: Rank::Nine
+                rank: Rank::Nine,
             }
         );
         assert_eq!(
             Card::from_string("DIAMONDS#QUEEN".to_string()),
             Card {
                 suit: Suit::Diamonds,
-                rank: Rank::Queen
+                rank: Rank::Queen,
             }
         );
     }
@@ -135,5 +144,20 @@ mod tests {
     #[should_panic]
     fn wrong_rank() {
         Card::from_string("CLUBS#QUUEEN".to_string());
+    }
+
+    #[test]
+    fn correct_to_byte() {
+        let card = Card {
+            suit: Suit::Spades,
+            rank: Rank::Five,
+        };
+        assert_eq!(card.to_byte(), 0b00_11_0101);
+
+        let card = Card {
+            suit: Suit::Hearts,
+            rank: Rank::King,
+        };
+        assert_eq!(card.to_byte(), 0b00_10_1101);
     }
 }
