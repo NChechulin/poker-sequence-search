@@ -86,20 +86,22 @@ impl Card {
     }
 }
 
-pub fn generate_all_cards() -> Vec<String> {
-    let mut result = vec![];
-    for suit in ["CLUBS", "DIAMONDS", "HEARTS", "SPADES"] {
-        for rank in ["ACE", "2", "3", "4", "5", "6", "7", "8", "9", "10", "JACK", "QUEEN", "KING"] {
-            result.push(format!("{}#{}", suit, rank));
-        }
-    }
 
-    result
-}
 
 #[cfg(test)]
 mod tests {
-    use crate::card::{Card, generate_all_cards, Rank, Suit};
+    use crate::card::{Card, Rank, Suit};
+
+    pub fn generate_all_cards() -> Vec<String> {
+        let mut result = vec![];
+        for suit in ["CLUBS", "DIAMONDS", "HEARTS", "SPADES"] {
+            for rank in ["ACE", "2", "3", "4", "5", "6", "7", "8", "9", "10", "JACK", "QUEEN", "KING"] {
+                result.push(format!("{}#{}", suit, rank));
+            }
+        }
+
+        result
+    }
 
     #[test]
     fn correct_parsing() {
