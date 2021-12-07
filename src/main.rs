@@ -25,7 +25,7 @@ fn parse_line(line: String) -> Vec<Card> {
 
 fn read_cards(whose_cards: &str) -> Vec<Card> {
     print!("Input {} cards: ", whose_cards);
-    io::stdout().flush().ok().expect("Could not flush stdout");
+    io::stdout().flush().expect("Could not flush stdout");
 
     let mut line = String::new();
     let stdin = io::stdin();
