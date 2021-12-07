@@ -16,7 +16,7 @@ fn parse_line(line: String) -> Vec<Card> {
     let mut result = vec![];
 
     for card in line.trim().split(' ') {
-        result.push(Card::from_string(card.to_string()));
+        result.push(Card::from_string(&card.to_string()));
     }
 
     result
@@ -26,10 +26,12 @@ fn read_cards(whose_cards: &str) -> Vec<Card> {
     print!("Input {} cards: ", whose_cards);
     io::stdout().flush().ok().expect("Could not flush stdout");
 
-
     let mut line = String::new();
     let stdin = io::stdin();
-    stdin.lock().read_line(&mut line).expect("Could not read line");
+    stdin
+        .lock()
+        .read_line(&mut line)
+        .expect("Could not read line");
 
     parse_line(line)
 }
@@ -66,13 +68,17 @@ fn main() {
     }
 }
 
+// Card:  0x00SSRRRR
+// Joker: 0x01000000
+
 #[cfg(test)]
 mod tests {
     use crate::{parse_line, solve};
 
     #[test]
     fn test_1() {
-        let computer = "CLUBS#ACE CLUBS#ACE CLUBS#ACE HEARTS#JACK SPADES#9 SPADES#9 HEARTS#JACK SPADES#9";
+        let computer =
+            "CLUBS#ACE CLUBS#ACE CLUBS#ACE HEARTS#JACK SPADES#9 SPADES#9 HEARTS#JACK SPADES#9";
         let user = "HEARTS#JACK SPADES#9";
 
         let computer = parse_line(computer.to_string());
@@ -85,7 +91,8 @@ mod tests {
 
     #[test]
     fn test_2() {
-        let computer = "CLUBS#ACE CLUBS#ACE CLUBS#ACE HEARTS#JACK SPADES#9 SPADES#9 HEARTS#JACK SPADES#9";
+        let computer =
+            "CLUBS#ACE CLUBS#ACE CLUBS#ACE HEARTS#JACK SPADES#9 SPADES#9 HEARTS#JACK SPADES#9";
         let user = "HEARTS#ACE SPADES#ACE";
 
         let computer = parse_line(computer.to_string());
@@ -93,6 +100,20 @@ mod tests {
 
         let result = solve(computer, user);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_joker() {
+        let computer =
+            "CLUBS#ACE CLUBS#ACE CLUBS#ACE HEARTS#JACK SPADES#9 SPADES#9 HEARTS#JACK SPADES#9";
+        let user = "JOKER HEARTS#JACK SPADES#9";
+
+        let computer = parse_line(computer.to_string());
+        let user = parse_line(user.to_string());
+
+        let result = solve(computer, user);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), vec![2, 5]);
     }
 
     // TODO: more tests

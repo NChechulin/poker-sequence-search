@@ -1,5 +1,6 @@
 extern crate num;
 
+use crate::zfinder::JOKER;
 use num::FromPrimitive;
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
@@ -30,9 +31,30 @@ pub enum Rank {
 }
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
-pub struct Card {
+pub struct CasualCard {
     pub suit: Suit,
     pub rank: Rank,
+}
+
+pub enum Card {
+    Casual(CasualCard),
+    Joker,
+}
+
+impl Card {
+    pub fn from_string(s: &String) -> Card {
+        match s.as_str() {
+            "JOKER" => Card::Joker,
+            _ => Card::Casual(CasualCard::from_string(s.to_string())),
+        }
+    }
+
+    pub fn to_byte(&self) -> u8 {
+        match self {
+            Card::Joker => JOKER,
+            Card::Casual(card) => card.to_byte(),
+        }
+    }
 }
 
 impl Suit {
@@ -62,23 +84,23 @@ impl Rank {
     }
 }
 
-impl Card {
-    pub fn from_string(s: String) -> Card {
+impl CasualCard {
+    pub fn from_string(s: String) -> CasualCard {
         let tokens: Vec<String> = s.split('#').map(|s| s.to_string()).collect();
         if tokens.len() != 2 {
-            panic!("Wrong card format provided. Correct: `SUIT#RANK`");
+            panic!("Wrong CasualCard format provided. Correct: `SUIT#RANK`");
         }
         let suit = &tokens[0];
         let rank = &tokens[1];
-        Card {
+        CasualCard {
             suit: Suit::from_string(suit),
             rank: Rank::from_string(rank),
         }
     }
 
-    /// represent card as a byte
+    /// represent CasualCard as a byte
     pub fn to_byte(&self) -> u8 {
-        // formatted as follows: `0x00SSRRRR` where SS is a suit (bin 00-11) and RRRR is a rank (bin 0001-1101);
+        // formatted as follows: `0b00SSRRRR` where SS is a suit (bin 00-11) and RRRR is a rank (bin 0001-1101);
         let rank = self.rank.clone() as u8;
         let suit = self.suit.clone() as u8;
 
@@ -86,19 +108,22 @@ impl Card {
     }
 }
 
-
-
 #[cfg(test)]
 mod tests {
-    use crate::card::{Card, Rank, Suit};
+    use crate::card::{Card, CasualCard, Rank, Suit};
+    use crate::zfinder::JOKER;
 
     pub fn generate_all_cards() -> Vec<String> {
         let mut result = vec![];
         for suit in ["CLUBS", "DIAMONDS", "HEARTS", "SPADES"] {
-            for rank in ["ACE", "2", "3", "4", "5", "6", "7", "8", "9", "10", "JACK", "QUEEN", "KING"] {
+            for rank in [
+                "ACE", "2", "3", "4", "5", "6", "7", "8", "9", "10", "JACK", "QUEEN", "KING",
+            ] {
                 result.push(format!("{}#{}", suit, rank));
             }
         }
+
+        result.push("JOKER".to_string());
 
         result
     }
@@ -106,29 +131,29 @@ mod tests {
     #[test]
     fn correct_parsing() {
         assert_eq!(
-            Card::from_string("CLUBS#ACE".to_string()),
-            Card {
+            CasualCard::from_string("CLUBS#ACE".to_string()),
+            CasualCard {
                 suit: Suit::Clubs,
                 rank: Rank::Ace,
             }
         );
         assert_eq!(
-            Card::from_string("HEARTS#JACK".to_string()),
-            Card {
+            CasualCard::from_string("HEARTS#JACK".to_string()),
+            CasualCard {
                 suit: Suit::Hearts,
                 rank: Rank::Jack,
             }
         );
         assert_eq!(
-            Card::from_string("SPADES#9".to_string()),
-            Card {
+            CasualCard::from_string("SPADES#9".to_string()),
+            CasualCard {
                 suit: Suit::Spades,
                 rank: Rank::Nine,
             }
         );
         assert_eq!(
-            Card::from_string("DIAMONDS#QUEEN".to_string()),
-            Card {
+            CasualCard::from_string("DIAMONDS#QUEEN".to_string()),
+            CasualCard {
                 suit: Suit::Diamonds,
                 rank: Rank::Queen,
             }
@@ -138,46 +163,49 @@ mod tests {
     #[test]
     fn all_possible_cards_are_parsed() {
         for card in generate_all_cards() {
-            Card::from_string(card);
+            Card::from_string(&card);
         }
     }
 
     #[test]
     #[should_panic]
     fn not_enough_tokens() {
-        Card::from_string("CLUBS".to_string());
+        CasualCard::from_string("CLUBS".to_string());
     }
 
     #[test]
     #[should_panic]
     fn no_delimiter() {
-        Card::from_string("CLUBS11".to_string());
+        CasualCard::from_string("CLUBS11".to_string());
     }
 
     #[test]
     #[should_panic]
     fn wrong_suit() {
-        Card::from_string("CLUUBS#11".to_string());
+        CasualCard::from_string("CLUUBS#11".to_string());
     }
 
     #[test]
     #[should_panic]
     fn wrong_rank() {
-        Card::from_string("CLUBS#QUUEEN".to_string());
+        CasualCard::from_string("CLUBS#QUUEEN".to_string());
     }
 
     #[test]
     fn correct_to_byte() {
-        let card = Card {
+        let card = CasualCard {
             suit: Suit::Spades,
             rank: Rank::Five,
         };
         assert_eq!(card.to_byte(), 0b00_11_0101);
 
-        let card = Card {
+        let card = CasualCard {
             suit: Suit::Hearts,
             rank: Rank::King,
         };
         assert_eq!(card.to_byte(), 0b00_10_1101);
+
+        let card = Card::Joker;
+        assert_eq!(card.to_byte(), JOKER);
     }
 }

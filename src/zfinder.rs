@@ -1,3 +1,5 @@
+pub const JOKER: u8 = 0b01000000;
+
 pub struct ZFinder {
     cursor: usize,
     pattern_size: usize,
@@ -27,7 +29,13 @@ impl ZFinder {
         let mut cnt = 0;
         let max = std::cmp::max(first, second);
 
-        while max + cnt < self.joined.len() && self.joined[first + cnt] == self.joined[second + cnt] {
+        // first >= second
+        // joined = pattern$data
+
+        while max + cnt < self.joined.len()
+            && (self.joined[first + cnt] == self.joined[second + cnt]
+                || self.joined[second + cnt] == JOKER)
+        {
             cnt += 1;
         }
 
@@ -83,7 +91,7 @@ impl ZFinder {
 
         return match result.is_empty() {
             true => Err("No occurrences"),
-            false => Ok(result)
+            false => Ok(result),
         };
     }
 }
