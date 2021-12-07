@@ -42,10 +42,10 @@ pub enum Card {
 }
 
 impl Card {
-    pub fn from_string(s: &String) -> Card {
-        match s.as_str() {
+    pub fn from_string(s: &str) -> Card {
+        match s {
             "JOKER" => Card::Joker,
-            _ => Card::Casual(CasualCard::from_string(s.to_string())),
+            _ => Card::Casual(CasualCard::from_string(s)),
         }
     }
 
@@ -58,8 +58,8 @@ impl Card {
 }
 
 impl Suit {
-    pub fn from_string(s: &String) -> Suit {
-        match s.as_str() {
+    pub fn from_string(s: &str) -> Suit {
+        match s {
             "CLUBS" => Suit::Clubs,
             "DIAMONDS" => Suit::Diamonds,
             "HEARTS" => Suit::Hearts,
@@ -70,8 +70,8 @@ impl Suit {
 }
 
 impl Rank {
-    pub fn from_string(s: &String) -> Rank {
-        let num: u8 = match s.as_str() {
+    pub fn from_string(s: &str) -> Rank {
+        let num: u8 = match s {
             "ACE" => 1,
             "JACK" => 11,
             "QUEEN" => 12,
@@ -85,7 +85,7 @@ impl Rank {
 }
 
 impl CasualCard {
-    pub fn from_string(s: String) -> CasualCard {
+    pub fn from_string(s: &str) -> CasualCard {
         let tokens: Vec<String> = s.split('#').map(|s| s.to_string()).collect();
         if tokens.len() != 2 {
             panic!("Wrong CasualCard format provided. Correct: `SUIT#RANK`");
@@ -101,8 +101,8 @@ impl CasualCard {
     /// represent CasualCard as a byte
     pub fn to_byte(&self) -> u8 {
         // formatted as follows: `0b00SSRRRR` where SS is a suit (bin 00-11) and RRRR is a rank (bin 0001-1101);
-        let rank = self.rank.clone() as u8;
-        let suit = self.suit.clone() as u8;
+        let rank = self.rank as u8;
+        let suit = self.suit as u8;
 
         (suit << 4) + rank
     }
@@ -131,28 +131,28 @@ mod tests {
     #[test]
     fn correct_parsing() {
         assert_eq!(
-            CasualCard::from_string("CLUBS#ACE".to_string()),
+            CasualCard::from_string("CLUBS#ACE"),
             CasualCard {
                 suit: Suit::Clubs,
                 rank: Rank::Ace,
             }
         );
         assert_eq!(
-            CasualCard::from_string("HEARTS#JACK".to_string()),
+            CasualCard::from_string("HEARTS#JACK"),
             CasualCard {
                 suit: Suit::Hearts,
                 rank: Rank::Jack,
             }
         );
         assert_eq!(
-            CasualCard::from_string("SPADES#9".to_string()),
+            CasualCard::from_string("SPADES#9"),
             CasualCard {
                 suit: Suit::Spades,
                 rank: Rank::Nine,
             }
         );
         assert_eq!(
-            CasualCard::from_string("DIAMONDS#QUEEN".to_string()),
+            CasualCard::from_string("DIAMONDS#QUEEN"),
             CasualCard {
                 suit: Suit::Diamonds,
                 rank: Rank::Queen,
@@ -170,25 +170,25 @@ mod tests {
     #[test]
     #[should_panic]
     fn not_enough_tokens() {
-        CasualCard::from_string("CLUBS".to_string());
+        CasualCard::from_string("CLUBS");
     }
 
     #[test]
     #[should_panic]
     fn no_delimiter() {
-        CasualCard::from_string("CLUBS11".to_string());
+        CasualCard::from_string("CLUBS11");
     }
 
     #[test]
     #[should_panic]
     fn wrong_suit() {
-        CasualCard::from_string("CLUUBS#11".to_string());
+        CasualCard::from_string("CLUUBS#11");
     }
 
     #[test]
     #[should_panic]
     fn wrong_rank() {
-        CasualCard::from_string("CLUBS#QUUEEN".to_string());
+        CasualCard::from_string("CLUBS#QUUEEN");
     }
 
     #[test]
