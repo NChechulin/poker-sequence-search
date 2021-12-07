@@ -8,7 +8,7 @@ pub struct ZFinder {
 }
 
 impl ZFinder {
-    pub fn new(data: &Vec<u8>, pattern: &Vec<u8>) -> ZFinder {
+    pub fn new(data: &[u8], pattern: &[u8]) -> ZFinder {
         let mut joined = vec![];
         joined.extend(pattern);
         joined.push(u8::MAX);
