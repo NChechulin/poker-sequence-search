@@ -16,7 +16,8 @@ fn parse_line(line: String) -> Vec<Card> {
     let mut result = vec![];
 
     for card in line.trim().split(' ') {
-        result.push(Card::from_string(&card.to_string()));
+        let new_card = Card::from_string(&card.to_string());
+        result.push(new_card);
     }
 
     result
@@ -67,9 +68,6 @@ fn main() {
         }
     }
 }
-
-// Card:  0x00SSRRRR
-// Joker: 0x01000000
 
 #[cfg(test)]
 mod tests {
