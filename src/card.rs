@@ -36,6 +36,7 @@ pub struct CasualCard {
     pub rank: Rank,
 }
 
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub enum Card {
     Casual(CasualCard),
     Joker,
@@ -49,10 +50,10 @@ impl Card {
         }
     }
 
-    pub fn to_byte(&self) -> u8 {
+    pub fn as_byte(self) -> u8 {
         match self {
             Card::Joker => JOKER,
-            Card::Casual(card) => card.to_byte(),
+            Card::Casual(card) => card.as_byte(),
         }
     }
 }
@@ -99,7 +100,7 @@ impl CasualCard {
     }
 
     /// represent CasualCard as a byte
-    pub fn to_byte(&self) -> u8 {
+    pub fn as_byte(self) -> u8 {
         // formatted as follows: `0b00SSRRRR` where SS is a suit (bin 00-11) and RRRR is a rank (bin 0001-1101);
         let rank = self.rank as u8;
         let suit = self.suit as u8;
@@ -197,15 +198,15 @@ mod tests {
             suit: Suit::Spades,
             rank: Rank::Five,
         };
-        assert_eq!(card.to_byte(), 0b00_11_0101);
+        assert_eq!(card.as_byte(), 0b00_11_0101);
 
         let card = CasualCard {
             suit: Suit::Hearts,
             rank: Rank::King,
         };
-        assert_eq!(card.to_byte(), 0b00_10_1101);
+        assert_eq!(card.as_byte(), 0b00_10_1101);
 
         let card = Card::Joker;
-        assert_eq!(card.to_byte(), JOKER);
+        assert_eq!(card.as_byte(), JOKER);
     }
 }

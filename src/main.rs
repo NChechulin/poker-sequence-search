@@ -43,8 +43,8 @@ fn solve(computer_cards: Vec<Card>, player_cards: Vec<Card>) -> Result<Vec<usize
         exit(1);
     }
 
-    let data: Vec<u8> = computer_cards.iter().map(|card| card.to_byte()).collect();
-    let pattern: Vec<u8> = player_cards.iter().map(|card| card.to_byte()).collect();
+    let data: Vec<u8> = computer_cards.iter().map(|card| card.as_byte()).collect();
+    let pattern: Vec<u8> = player_cards.iter().map(|card| card.as_byte()).collect();
 
     let mut zfinder = ZFinder::new(&data, &pattern);
 
