@@ -53,15 +53,13 @@ impl ZFinder {
                 self.z_arr[i] = cnt;
                 window_left = i;
                 window_right = i + cnt - 1;
+            } else if self.z_arr[i - window_left] < window_right - i + 1 {
+                self.z_arr[i] = self.z_arr[i - window_left];
             } else {
-                if self.z_arr[i - window_left] < window_right - i + 1 {
-                    self.z_arr[i] = self.z_arr[i - window_left];
-                } else {
-                    let cnt = self.compare_parts(window_right + 1, window_right - window_left + 1);
-                    self.z_arr[i] = window_right - i + 1 + cnt;
-                    window_left = i;
-                    window_right = window_right + self.z_arr[i] - 1;
-                }
+                let cnt = self.compare_parts(window_right + 1, window_right - window_left + 1);
+                self.z_arr[i] = window_right - i + 1 + cnt;
+                window_left = i;
+                window_right = window_right + self.z_arr[i] - 1;
             }
         }
     }
@@ -82,16 +80,13 @@ impl ZFinder {
     pub fn find_all(&mut self) -> Result<Vec<usize>, &str> {
         let mut result = vec![];
 
-        loop {
-            match self.find() {
-                Ok(occurrence) => result.push(occurrence),
-                Err(_) => break,
-            }
+        while let Ok(occurrence) = self.find() {
+            result.push(occurrence);
         }
 
-        return match result.is_empty() {
+        match result.is_empty() {
             true => Err("No occurrences"),
             false => Ok(result),
-        };
+        }
     }
 }
